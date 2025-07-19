@@ -133,7 +133,7 @@ const App = () => {
         <AppBar position="static" sx={{ background: 'transparent', boxShadow: 'none' }}>
           <Toolbar>
             <img
-              src="/logo.jpg"
+              src="/logo.png"
               alt="Your Brand Logo"
               style={{ height: '50px', marginRight: '16px' }}
             />
