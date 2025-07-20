@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import {
   AppBar,
   Toolbar,
@@ -13,12 +13,17 @@ import {
   List,
   ListItem,
   Link,
+  IconButton,
+  Drawer,
+  MenuItem,
+  useMediaQuery
 } from '@mui/material'
 import {
   Phone,
   Mail,
   Instagram,
-  Youtube
+  Youtube,
+  Menu
 } from 'lucide-react'
 
 const theme = createTheme({
@@ -104,6 +109,14 @@ const App = () => {
   const servicesRef = useRef(null);
   const contactUsRef = useRef(null);
 
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
   const scrollToSection = (ref) => {
     if (ref.current) {
       const currentAppBarHeight = window.innerWidth <= 600 ? parseFloat(appBarHeightXs) : parseFloat(appBarHeight);
@@ -113,8 +126,34 @@ const App = () => {
         top: elementPosition - offset,
         behavior: 'smooth',
       });
+      setMobileOpen(false);
     }
   };
+
+  const navItems = [
+    { name: 'Home', ref: homeRef },
+    { name: 'About Us', ref: aboutUsRef },
+    { name: 'Services', ref: servicesRef },
+    { name: 'Contact Us', ref: contactUsRef },
+  ];
+
+  const drawer = (
+    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
+      <Typography variant="h6" sx={{ my: 2 }}>
+        KGL Enterprises
+      </Typography>
+      <List>
+        {navItems.map((item) => (
+          <MenuItem key={item.name} onClick={() => scrollToSection(item.ref)}>
+            {item.name}
+          </MenuItem>
+        ))}
+      </List>
+    </Box>
+  );
+
+  const longText = "We provide end-to-end support for paddy and groundnut farming—from cultivation and harvesting to baling, threshing, and transport. Looking to buy or sell tractors and equipment? Our park & sell service has you covered. From machinery to market, we’re committed to empowering farmers at every step.";
+  const shortText = "Complete support for paddy and groundnut farming—from cultivation to transport. Buy or sell farm equipment easily with our park & sell service. Empowering farmers from machinery to market.";
 
   return (
     <ThemeProvider theme={theme}>
@@ -122,7 +161,7 @@ const App = () => {
 
       <Box
         sx={{
-          backgroundImage: 'url(/bg.jpg)',
+          backgroundImage: 'url(https://rare-gallery.com/uploads/posts/922893-landscape-farm-field.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'fixed',
@@ -138,36 +177,46 @@ const App = () => {
               style={{ height: '50px', marginRight: '16px' }}
             />
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} />
-            <Button
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              {navItems.map((item) => (
+                <Button
+                  key={item.name}
+                  color="inherit"
+                  sx={{ color: 'yellow', fontSize: '1.05rem', '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' }, mx: 1 }}
+                  onClick={() => scrollToSection(item.ref)}
+                >
+                  {item.name}
+                </Button>
+              ))}
+            </Box>
+            <IconButton
               color="inherit"
-              sx={{ color: 'yellow', fontSize: '1.05rem', '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' }, mx: 1 }}
-              onClick={() => scrollToSection(homeRef)}
+              aria-label="open drawer"
+              edge="end"
+              onClick={handleDrawerToggle}
+              sx={{ ml: 2, display: { sm: 'none' } }}
             >
-              Home
-            </Button>
-            <Button
-              color="inherit"
-              sx={{ color: 'yellow', fontSize: '1.05rem', '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' }, mx: 1 }}
-              onClick={() => scrollToSection(aboutUsRef)}
-            >
-              About Us
-            </Button>
-            <Button
-              color="inherit"
-              sx={{ color: 'yellow', fontSize: '1.05rem', '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' }, mx: 1 }}
-              onClick={() => scrollToSection(servicesRef)}
-            >
-              Services
-            </Button>
-            <Button
-              color="inherit"
-              sx={{ color: 'yellow', fontSize: '1.1rem', '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' }, mx: 1 }}
-              onClick={() => scrollToSection(contactUsRef)}
-            >
-              Contact Us
-            </Button>
+              <Menu />
+            </IconButton>
           </Toolbar>
         </AppBar>
+
+        <nav>
+          <Drawer
+            variant="temporary"
+            open={mobileOpen}
+            onClose={handleDrawerToggle}
+            ModalProps={{
+              keepMounted: true,
+            }}
+            sx={{
+              display: { xs: 'block', sm: 'none' },
+              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 240 },
+            }}
+          >
+            {drawer}
+          </Drawer>
+        </nav>
 
         <Box
           ref={homeRef}
@@ -192,9 +241,7 @@ const App = () => {
             KGL Enterprises
           </Typography>
           <Typography variant="h5" sx={{ mb: 3, color: '#E0E0E0' }}>
-            We provide end-to-end support for paddy and groundnut farming—from cultivation and harvesting to baling, threshing, and transport.
-            Looking to buy or sell tractors and equipment? Our park & sell service has you covered.
-            From machinery to market, we’re committed to empowering farmers at every step.
+            {isSmallScreen ? shortText : longText}
           </Typography>
           <Button
             variant="contained"
